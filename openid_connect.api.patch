@@ -1,0 +1,31 @@
+diff --git a/modules/contrib/openid_connect/openid_connect.api.php b/./patch/openid_connect.api.php
+index 3dd0177a6..f067a9d1e 100644
+--- a/modules/contrib/openid_connect/openid_connect.api.php
++++ b/./patch/openid_connect.api.php
+@@ -145,17 +145,16 @@ function hook_openid_connect_userinfo_alter(array &$userinfo, array $context) {
+  * @ingroup openid_connect_api
+  */
+ function hook_openid_connect_pre_authorize($account, array $context) {
+-  // Allow access only for users with the role 'elevated'.
+-  if (($account && $account->hasRole('elevated')) || (
+-    $context['plugin_id'] == 'generic'
+-    && isset($context['userinfo']['roles'])
+-    && in_array('elevated', $context['userinfo']['roles'])
+-  )) {
+-    return TRUE;
+-  }
++    // Deny access only for users with the role not 'elevated'.
++    if (
++      $context['plugin_id'] == 'generic'
++      && isset($context['userinfo']['roles'])
++      && !in_array('elevated', $context['userinfo']['roles'])) {
++        return false;
++    }
+ 
+-  // Deny all other users.
+-  return FALSE;
++    // Allow all other users.
++    return true;
+ }
+ 
+ /**
